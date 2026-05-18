@@ -127,7 +127,9 @@ node scripts/gemma-review/publish-comments.mjs \
 
 ## 쉽게 설치해서 쓰는 방법
 
-가장 쉬운 방식은 이 저장소의 reusable workflow를 호출하는 것입니다.
+### 가장 쉬운 방법: workflow 파일 하나만 추가
+
+사용하려는 저장소에 `.github/workflows/gemma-review.yml` 파일을 만들고 아래 내용을 그대로 붙여 넣으면 됩니다. npm 설치나 별도 서버 준비가 필요 없습니다.
 
 ```yaml
 name: Gemma Review
@@ -148,13 +150,40 @@ jobs:
       min-confidence: '0.6'
 ```
 
-npm 패키지로도 배포할 수 있도록 `scripts/gemma-review/package.json`에 CLI bin을 준비했습니다.
+이후 PR을 열면 GitHub Actions가 자동으로 실행됩니다.
+
+1. PR diff를 준비합니다.
+2. GitHub-hosted runner에서 Ollama와 Gemma 모델을 실행합니다.
+3. PR summary comment를 남깁니다.
+4. 문제가 있는 변경 라인에는 inline comment를 남깁니다.
+5. `high` 또는 `critical` 문제가 있으면 check를 실패시킵니다.
+
+처음에는 위 설정 그대로 쓰는 것을 권장합니다. 더 조용하게 쓰고 싶으면 `min-confidence`를 `0.7` 이상으로 올리고, 더 많은 코멘트를 받고 싶으면 `max-inline-comments`를 늘리면 됩니다.
+
+### 더 안전하게 고정해서 쓰기
+
+현재는 바로 테스트하기 쉽도록 `@main` 예시를 제공합니다. 운영 저장소에서는 릴리즈 태그를 만든 뒤 아래처럼 고정해서 쓰는 편이 안전합니다.
+
+```yaml
+jobs:
+  gemma-review:
+    uses: bssm-oss/gemmaci/.github/workflows/gemma-review.yml@v1
+    with:
+      model: gemma3:1b
+      language: ko
+```
+
+### npm CLI로 직접 돌리는 방법
+
+GitHub Actions가 아닌 다른 CI나 로컬 검증에서 쓰려면 npm CLI를 사용할 수 있습니다. npm 패키지로 배포할 수 있도록 `scripts/gemma-review/package.json`에 CLI bin을 준비했습니다.
 
 ```bash
 npm exec @bssm-oss/gemma-reviewer -- gemma-review-prepare --output review-input.json
 npm exec @bssm-oss/gemma-reviewer -- gemma-review-run --input review-input.json --output review-output.json
 npm exec @bssm-oss/gemma-reviewer -- gemma-review-publish --review-input review-input.json --input review-output.json
 ```
+
+단, 일반 사용자는 npm CLI보다 위 reusable workflow 방식이 더 쉽습니다. CLI는 커스텀 CI, self-hosted runner, 로컬 디버깅용으로 보면 됩니다.
 
 현재 이 환경은 npm 로그인이 되어 있지 않아 실제 `npm publish`는 하지 않았습니다. publish 전 검증은 다음 명령으로 가능합니다.
 
