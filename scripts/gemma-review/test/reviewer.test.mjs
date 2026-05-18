@@ -334,6 +334,8 @@ test('summary includes review quality counters', async () => {
   assert.match(output.summary, /## Highest-risk findings/);
   assert.match(output.summary, /src\/math\.js:2/);
   assert.match(output.summary, /Minimum confidence: 60%/);
+  assert.doesNotMatch(output.summary, /^high$/m);
+  assert.doesNotMatch(output.summary, /^None$/m);
   assert.match(output.summary, /Categories: correctness=1/);
   assert.match(output.summary, /## Review scope/);
   assert.match(output.summary, /Files reviewed: 1/);
