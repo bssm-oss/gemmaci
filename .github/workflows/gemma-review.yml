@@ -1,6 +1,20 @@
 name: Gemma Review
 
 on:
+  workflow_call:
+    inputs:
+      model:
+        type: string
+        default: gemma3:1b
+      language:
+        type: string
+        default: ko
+      max-inline-comments:
+        type: number
+        default: 20
+      min-confidence:
+        type: string
+        default: '0.6'
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
 
@@ -11,19 +25,20 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GEMMA_REVIEW_MODEL: gemma3:1b
+  GEMMA_REVIEW_MODEL: ${{ inputs.model || 'gemma3:1b' }}
   GEMMA_REVIEW_OLLAMA_VERSION: 0.12.10
   GEMMA_REVIEW_OLLAMA_LINUX_AMD64_SHA256: 8f4bf70a9856a34ba71355745c2189a472e2691a020ebd2e242a58e4d2094722
   GEMMA_REVIEW_CACHE_VERSION: v2
   GEMMA_REVIEW_MAX_DIFF_BYTES: 200000
   GEMMA_REVIEW_MAX_FILE_BYTES: 60000
   GEMMA_REVIEW_MAX_CHUNK_BYTES: 24000
-  GEMMA_REVIEW_MAX_INLINE_COMMENTS: 20
-  GEMMA_REVIEW_MIN_CONFIDENCE: 0.6
+  GEMMA_REVIEW_DIFF_CONTEXT_LINES: 3
+  GEMMA_REVIEW_MAX_INLINE_COMMENTS: ${{ inputs['max-inline-comments'] || 20 }}
+  GEMMA_REVIEW_MIN_CONFIDENCE: ${{ inputs['min-confidence'] || '0.6' }}
   GEMMA_REVIEW_DETERMINISTIC_RULES: true
   GEMMA_REVIEW_TIMEOUT_MS: 600000
   GEMMA_REVIEW_FAIL_ON_SEVERITY: critical,high
-  GEMMA_REVIEW_LANGUAGE: ko
+  GEMMA_REVIEW_LANGUAGE: ${{ inputs.language || 'ko' }}
 
 jobs:
   prepare:

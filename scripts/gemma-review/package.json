@@ -1,13 +1,29 @@
 {
-  "name": "gemma-reviewer",
+  "name": "@bssm-oss/gemma-reviewer",
   "version": "0.1.0",
-  "private": true,
+  "description": "GitHub Actions PR reviewer powered by Gemma/Ollama with evidence-grounded inline comments.",
+  "license": "MIT",
   "type": "module",
+  "bin": {
+    "gemma-review-prepare": "./prepare-diff.mjs",
+    "gemma-review-run": "./review.mjs",
+    "gemma-review-publish": "./publish-comments.mjs"
+  },
+  "files": [
+    "*.mjs",
+    "README.md"
+  ],
   "scripts": {
-    "prepare": "node prepare-diff.mjs",
+    "prepare:diff": "node prepare-diff.mjs",
     "review": "node review.mjs",
     "publish": "node publish-comments.mjs",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "pack:check": "npm pack --dry-run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bssm-oss/gemmaci.git",
+    "directory": "scripts/gemma-review"
   },
   "engines": {
     "node": ">=20"
