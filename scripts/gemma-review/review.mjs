@@ -289,11 +289,28 @@ function buildSummary({ summaries, findings, reviewedFileCount, skippedFiles, to
 function normalizeSummaryParts(payload) {
   const parts = [];
   for (const key of ['summary', 'change_summary', 'risk_assessment', 'test_gaps', 'review_notes']) {
-    if (typeof payload[key] === 'string' && payload[key].trim()) {
-      parts.push(payload[key].trim().slice(0, 2000));
+    if (typeof payload[key] === 'string') {
+      const part = normalizeSummaryPart(payload[key]);
+      if (part) {
+        parts.push(part);
+      }
     }
   }
   return parts;
+}
+
+function normalizeSummaryPart(value) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return '';
+  }
+
+  const normalized = trimmed.toLowerCase();
+  if (['none', 'n/a', 'na', 'null', 'undefined'].includes(normalized) || SEVERITIES.includes(normalized)) {
+    return '';
+  }
+
+  return trimmed.slice(0, 2000);
 }
 
 function compareFindingPriority(left, right) {

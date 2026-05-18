@@ -1,5 +1,7 @@
 {
   "summary": "나눗셈 입력 검증이 부족합니다.",
+  "risk_assessment": "high",
+  "test_gaps": "None",
   "overall_severity": "high",
   "findings": [
     {
