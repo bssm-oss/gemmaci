@@ -16,7 +16,7 @@ const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
 test('prepareDiff filters excluded files and builds changed-line chunks', async () => {
   const tempDir = await mkdtemp(join(tmpdir(), 'gemma-review-'));
   const outputPath = join(tempDir, 'review-input.json');
-  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000' });
+  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000', GEMMA_REVIEW_DETERMINISTIC_RULES: 'false' });
 
   const result = await prepareDiff({
     eventPath: join(fixtureDir, 'pull_request_event.json'),
@@ -44,7 +44,7 @@ test('reviewPullRequest keeps only findings on valid changed lines', async () =>
   const tempDir = await mkdtemp(join(tmpdir(), 'gemma-review-'));
   const inputPath = join(tempDir, 'review-input.json');
   const outputPath = join(tempDir, 'review-output.json');
-  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000' });
+  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000', GEMMA_REVIEW_DETERMINISTIC_RULES: 'false' });
 
   await prepareDiff({
     eventPath: join(fixtureDir, 'pull_request_event.json'),
@@ -73,7 +73,7 @@ test('reviewPullRequest drops low-confidence findings to reduce noise', async ()
   const inputPath = join(tempDir, 'review-input.json');
   const outputPath = join(tempDir, 'review-output.json');
   const mockPath = join(tempDir, 'low-confidence.json');
-  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000', GEMMA_REVIEW_MIN_CONFIDENCE: '0.8' });
+  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000', GEMMA_REVIEW_MIN_CONFIDENCE: '0.8', GEMMA_REVIEW_DETERMINISTIC_RULES: 'false' });
 
   await prepareDiff({
     eventPath: join(fixtureDir, 'pull_request_event.json'),
@@ -105,7 +105,7 @@ test('reviewPullRequest drops findings whose evidence is not grounded in changed
   const inputPath = join(tempDir, 'review-input.json');
   const outputPath = join(tempDir, 'review-output.json');
   const mockPath = join(tempDir, 'ungrounded-evidence.json');
-  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000' });
+  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000', GEMMA_REVIEW_DETERMINISTIC_RULES: 'false' });
 
   await prepareDiff({
     eventPath: join(fixtureDir, 'pull_request_event.json'),
@@ -126,12 +126,34 @@ test('reviewPullRequest drops findings whose evidence is not grounded in changed
   assert.equal(result.findings[0].title, 'grounded evidence');
 });
 
+test('reviewPullRequest adds deterministic finding for unguarded division returns', async () => {
+  const tempDir = await mkdtemp(join(tmpdir(), 'gemma-review-'));
+  const inputPath = join(tempDir, 'review-input.json');
+  const outputPath = join(tempDir, 'review-output.json');
+  const mockPath = join(tempDir, 'empty-model.json');
+  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000' });
+
+  await prepareDiff({
+    eventPath: join(fixtureDir, 'pull_request_event.json'),
+    diffPath: join(fixtureDir, 'sample.diff'),
+    outputPath: inputPath,
+    config
+  });
+  await writeFile(mockPath, JSON.stringify({ summary: 'no model findings', findings: [] }));
+
+  const result = await reviewPullRequest({ inputPath, outputPath, mockModelPath: mockPath, config });
+  assert.equal(result.findings.length, 1);
+  assert.equal(result.findings[0].title, '0 나눗셈 검증 누락');
+  assert.match(result.findings[0].evidence, /export function unsafeDivide/);
+  assert.equal(result.overall_severity, 'high');
+});
+
 test('reviewPullRequest requires evidence, avoids partial line parsing, and strips unsafe suggestions', async () => {
   const tempDir = await mkdtemp(join(tmpdir(), 'gemma-review-'));
   const inputPath = join(tempDir, 'review-input.json');
   const outputPath = join(tempDir, 'review-output.json');
   const mockPath = join(tempDir, 'quality-schema.json');
-  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000' });
+  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000', GEMMA_REVIEW_DETERMINISTIC_RULES: 'false' });
 
   await prepareDiff({
     eventPath: join(fixtureDir, 'pull_request_event.json'),
@@ -199,7 +221,7 @@ test('reviewPullRequest keeps one highest priority finding per changed line', as
   const inputPath = join(tempDir, 'review-input.json');
   const outputPath = join(tempDir, 'review-output.json');
   const mockPath = join(tempDir, 'duplicates.json');
-  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000' });
+  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000', GEMMA_REVIEW_DETERMINISTIC_RULES: 'false' });
 
   await prepareDiff({
     eventPath: join(fixtureDir, 'pull_request_event.json'),
@@ -277,7 +299,7 @@ test('reviewPullRequest requires a concrete recommendation for each finding', as
   const inputPath = join(tempDir, 'review-input.json');
   const outputPath = join(tempDir, 'review-output.json');
   const mockPath = join(tempDir, 'missing-recommendation.json');
-  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000' });
+  const config = loadConfig({ GEMMA_REVIEW_MAX_CHUNK_BYTES: '24000', GEMMA_REVIEW_DETERMINISTIC_RULES: 'false' });
 
   await prepareDiff({
     eventPath: join(fixtureDir, 'pull_request_event.json'),
