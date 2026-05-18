@@ -1,0 +1,15 @@
+{
+  "name": "gemma-reviewer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare": "node prepare-diff.mjs",
+    "review": "node review.mjs",
+    "publish": "node publish-comments.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
