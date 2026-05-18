@@ -116,7 +116,8 @@ export function gitAuthArgs(token) {
     return [];
   }
 
-  return ['-c', `http.https://github.com/.extraheader=AUTHORIZATION: bearer ${token}`];
+  const credentials = Buffer.from(`x-access-token:${token}`, 'utf8').toString('base64');
+  return ['-c', `http.https://github.com/.extraheader=AUTHORIZATION: basic ${credentials}`];
 }
 
 function parseArgs(argv) {

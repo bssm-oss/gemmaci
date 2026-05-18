@@ -679,7 +679,7 @@ test('gitAuthArgs uses temporary extraheader only when token is present', () => 
   assert.deepEqual(gitAuthArgs(''), []);
   assert.deepEqual(gitAuthArgs('token123'), [
     '-c',
-    'http.https://github.com/.extraheader=AUTHORIZATION: bearer token123'
+    'http.https://github.com/.extraheader=AUTHORIZATION: basic eC1hY2Nlc3MtdG9rZW46dG9rZW4xMjM='
   ]);
 });
 
