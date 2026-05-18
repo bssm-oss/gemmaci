@@ -1,0 +1,6 @@
+.omc/
+.sisyphus/
+node_modules/
+review-input.json
+review-output.json
+dry-run.json
