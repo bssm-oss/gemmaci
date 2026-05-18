@@ -38,7 +38,7 @@
 이 저장소에서는 로컬 dry-run만 한 것이 아니라 GitHub Actions에서 실제 PR을 열어 검증했습니다.
 
 - 테스트 PR: `https://github.com/bssm-oss/gemmaci/pull/2`
-- 실제 workflow run: `https://github.com/bssm-oss/gemmaci/actions/runs/26009211725`
+- 실제 workflow run: `https://github.com/bssm-oss/gemmaci/actions/runs/26009436921`
 - `Prepare diff`: 성공
 - `Review with Gemma`: 성공
 - `Publish review`: 실패

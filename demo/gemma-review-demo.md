@@ -5,7 +5,7 @@
 ## Live targets
 
 - PR: https://github.com/bssm-oss/gemmaci/pull/2
-- Actions run: https://github.com/bssm-oss/gemmaci/actions/runs/26009211725
+- Actions run: https://github.com/bssm-oss/gemmaci/actions/runs/26009436921
 - Summary comment: https://github.com/bssm-oss/gemmaci/pull/2#issuecomment-4473499320
 - Inline finding: https://github.com/bssm-oss/gemmaci/pull/2#discussion_r3255933478
 
@@ -27,9 +27,9 @@
 ## Included data files
 
 - `pr-2-demo-data.json`: PR status, comments, checks, files.
-- `run-26009211725-demo-data.json`: Actions run and job details.
+- `run-26009436921-demo-data.json`: Actions run and job details.
 - `pr-2-inline-comments.json`: inline PR comments, including the Gemma reviewer comment.
-- `run-26009211725-artifacts.json`: Actions artifacts from the run.
+- `run-26009436921-artifacts.json`: Actions artifacts from the run.
 
 ## Optional video capture
 
