@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "pullRequest": {
+    "owner": "bssm-oss",
+    "repo": "gemmacitest",
+    "number": 7,
+    "baseSha": "1111111111111111111111111111111111111111",
+    "headSha": "2222222222222222222222222222222222222222"
+  },
+  "changedLines": {
+    "../owned.js": [1],
+    "src/math.js": [2]
+  },
+  "chunks": [],
+  "skippedFiles": []
+}

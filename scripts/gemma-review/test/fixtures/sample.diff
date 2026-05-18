@@ -1,0 +1,15 @@
+diff --git a/src/math.js b/src/math.js
+index 1111111..2222222 100644
+--- a/src/math.js
++++ b/src/math.js
+@@ -1 +1,2 @@
+-export function divide(a, b) { return a / b; }
++export function divide(a, b) { return a / b; }
++export function unsafeDivide(a, b) { return a / b; }
+diff --git a/package-lock.json b/package-lock.json
+index 3333333..4444444 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -1 +1 @@
+-{"lockfileVersion": 2}
++{"lockfileVersion": 3}

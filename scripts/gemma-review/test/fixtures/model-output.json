@@ -1,0 +1,29 @@
+{
+  "summary": "나눗셈 입력 검증이 부족합니다.",
+  "overall_severity": "high",
+  "findings": [
+    {
+      "path": "src/math.js",
+      "line": 2,
+      "category": "correctness",
+      "severity": "high",
+      "confidence": 0.91,
+      "title": "0 나눗셈 검증 누락",
+      "evidence": "변경 라인 `export function unsafeDivide(a, b) { return a / b; }`가 b === 0 검증 없이 a / b를 반환합니다.",
+      "body": "b가 0인 경우 Infinity가 반환될 수 있어 호출부에 오류가 전파됩니다.",
+      "recommendation": "b === 0일 때 명시적으로 예외를 던지거나 호출자가 처리할 수 있는 오류 값을 반환하세요.",
+      "suggestion": "if (b === 0) throw new Error('division by zero');"
+    },
+    {
+      "path": "../escape.js",
+      "line": 1,
+      "category": "security",
+      "severity": "critical",
+      "confidence": 0.95,
+      "title": "경로 탈출",
+      "evidence": "악성 경로입니다.",
+      "body": "이 finding은 검증에서 제거되어야 합니다.",
+      "recommendation": "저장소 내부의 변경된 라인만 참조하세요."
+    }
+  ]
+}

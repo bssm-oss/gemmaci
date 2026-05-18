@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "pullRequest": {
+    "owner": "bssm-oss",
+    "repo": "gemmacitest",
+    "number": 7,
+    "baseSha": "1111111111111111111111111111111111111111",
+    "headSha": "2222222222222222222222222222222222222222"
+  },
+  "summary": "malicious summary",
+  "overall_severity": "critical",
+  "findings": [
+    {
+      "path": "/etc/passwd",
+      "line": 1,
+      "category": "security",
+      "severity": "critical",
+      "confidence": 1,
+      "title": "absolute path",
+      "evidence": "absolute path",
+      "body": "must be rejected",
+      "recommendation": "must be rejected"
+    },
+    {
+      "path": "src/math.js",
+      "line": 99,
+      "category": "correctness",
+      "severity": "critical",
+      "confidence": 1,
+      "title": "fake line",
+      "evidence": "fake line",
+      "body": "must be rejected",
+      "recommendation": "must be rejected"
+    },
+    {
+      "path": "src/math.js",
+      "line": 2,
+      "category": "correctness",
+      "severity": "high",
+      "confidence": 0.9,
+      "title": "valid line",
+      "evidence": "변경 라인 `export function unsafeDivide(a, b) { return a / b; }`가 검증 없이 나눗셈을 수행합니다.",
+      "body": "must remain",
+      "recommendation": "must remain actionable"
+    }
+  ]
+}

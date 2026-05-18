@@ -1,0 +1,19 @@
+{
+  "repository": {
+    "full_name": "bssm-oss/gemmacitest"
+  },
+  "pull_request": {
+    "number": 7,
+    "base": {
+      "sha": "1111111111111111111111111111111111111111",
+      "ref": "main"
+    },
+    "head": {
+      "sha": "2222222222222222222222222222222222222222",
+      "ref": "feature/gemma-reviewer",
+      "repo": {
+        "full_name": "bssm-oss/gemmacitest"
+      }
+    }
+  }
+}
