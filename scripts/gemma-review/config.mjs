@@ -39,6 +39,7 @@ export function loadConfig(env = process.env) {
     maxChunkBytes: readInteger(env, 'GEMMA_REVIEW_MAX_CHUNK_BYTES', 24000),
     maxInlineComments: readInteger(env, 'GEMMA_REVIEW_MAX_INLINE_COMMENTS', 20),
     minConfidence: readNumber(env, 'GEMMA_REVIEW_MIN_CONFIDENCE', 0.6),
+    deterministicRules: readBoolean(env, 'GEMMA_REVIEW_DETERMINISTIC_RULES', true),
     timeoutMs: readInteger(env, 'GEMMA_REVIEW_TIMEOUT_MS', 600000),
     failOnSeverity: readSeverityList(env, 'GEMMA_REVIEW_FAIL_ON_SEVERITY', ['critical', 'high']),
     language: readString(env, 'GEMMA_REVIEW_LANGUAGE', 'ko'),
@@ -114,6 +115,20 @@ function readNumber(env, name, fallback) {
     throw new Error(`${name} must be a number`);
   }
   return parsed;
+}
+
+function readBoolean(env, name, fallback) {
+  const value = env[name];
+  if (value === undefined || value === '') {
+    return fallback;
+  }
+  if (value === 'true') {
+    return true;
+  }
+  if (value === 'false') {
+    return false;
+  }
+  throw new Error(`${name} must be true or false`);
 }
 
 function readList(env, name, fallback) {

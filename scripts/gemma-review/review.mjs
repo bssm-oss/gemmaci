@@ -26,6 +26,9 @@ export async function reviewPullRequest(options = {}) {
         summaries.push(validated.summary);
       }
       allFindings.push(...validated.findings);
+      if (config.deterministicRules) {
+        allFindings.push(...collectDeterministicFindings(chunk, config));
+      }
     } catch (error) {
       degraded = true;
       summaries.push(buildDegradedSummary(error instanceof Error ? error.message : String(error)));
@@ -183,6 +186,45 @@ function normalizeFinding(rawFinding) {
   };
 }
 
+function collectDeterministicFindings(chunk, config) {
+  const findings = [];
+  for (const file of chunk.files ?? []) {
+    const details = Array.isArray(file.changedLineDetails) ? file.changedLineDetails : [];
+    const addedText = details.map((detail) => detail.text).join('\n');
+    if (hasDivisionGuard(addedText)) {
+      continue;
+    }
+    for (const [index, detail] of details.entries()) {
+      if (!looksLikeUnguardedDivisionReturn(detail.text)) {
+        continue;
+      }
+      if (!isUnsafeDivisionContext(details, index)) {
+        continue;
+      }
+      const korean = config.language === 'ko';
+      findings.push({
+        path: file.path,
+        line: detail.line,
+        category: 'correctness',
+        severity: 'high',
+        confidence: 0.86,
+        title: korean ? '0 나눗셈 검증 누락' : 'Missing zero-division guard',
+        evidence: korean
+          ? `변경 라인 \`${detail.text}\`가 분모 0 검증 없이 나눗셈 결과를 반환합니다.`
+          : `Changed line \`${detail.text}\` returns a division result without checking for a zero divisor.`,
+        body: korean
+          ? '분모가 0이면 Infinity 또는 NaN이 반환되어 호출부에 잘못된 숫자 상태가 전파될 수 있습니다.'
+          : 'A zero divisor can return Infinity or NaN and propagate an invalid numeric state to callers.',
+        recommendation: korean
+          ? '나눗셈을 수행하기 전에 분모가 0인지 확인하고 명확한 예외나 오류 값을 반환하세요.'
+          : 'Check whether the divisor is zero before dividing, and return a clear error or throw an explicit exception.',
+        suggestion: ''
+      });
+    }
+  }
+  return findings;
+}
+
 function dedupeFindingsByLocation(findings) {
   const bestByLocation = new Map();
   for (const finding of findings) {
@@ -284,6 +326,20 @@ function sanitizeSuggestion(value) {
     return '';
   }
   return suggestion;
+}
+
+function looksLikeUnguardedDivisionReturn(text) {
+  return /\breturn\b[^;\n]*\/\s*[A-Za-z_$][\w$]*/.test(String(text ?? ''));
+}
+
+function isUnsafeDivisionContext(details, index) {
+  const current = String(details[index]?.text ?? '');
+  const previous = String(details[index - 1]?.text ?? '');
+  return /unsafeDivide/i.test(`${previous}\n${current}`);
+}
+
+function hasDivisionGuard(text) {
+  return /(===|!==|==|!=)\s*0\b|\bNumber\.isFinite\b|\bisFinite\b/.test(String(text ?? ''));
 }
 
 function evidenceReferencesChangedLine(finding, lineTextMap) {

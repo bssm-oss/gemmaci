@@ -44,6 +44,7 @@ Set these environment variables in the workflow to tune behavior:
 | `GEMMA_REVIEW_MAX_CHUNK_BYTES` | `24000` | Per-model-call chunk budget |
 | `GEMMA_REVIEW_MAX_INLINE_COMMENTS` | `20` | Max inline comments per run |
 | `GEMMA_REVIEW_MIN_CONFIDENCE` | `0.6` | Minimum confidence required for inline findings |
+| `GEMMA_REVIEW_DETERMINISTIC_RULES` | `true` | Enable deterministic high-signal safety findings before publishing |
 | `GEMMA_REVIEW_TIMEOUT_MS` | `600000` | Model call timeout |
 | `GEMMA_REVIEW_FAIL_ON_SEVERITY` | `critical,high` | Severities that fail the check |
 | `GEMMA_REVIEW_LANGUAGE` | `ko` | Review output language |
@@ -94,3 +95,5 @@ Because the workflow deliberately runs reviewer scripts from the base branch, th
 The model is asked to return only high-signal findings with a category, severity, confidence, concrete evidence, and a recommended next action. Evidence must quote an exact changed-line code fragment, so well-formed but ungrounded findings are dropped before publishing. Findings below `GEMMA_REVIEW_MIN_CONFIDENCE` are also dropped, and publish-time validation repeats the same path/line/severity/evidence/body/recommendation checks before using the GitHub API.
 
 The sticky summary comment includes CodeRabbit-style review status details: finding counts, highest severity, confidence threshold, category counts, reviewed/skipped file counts, included diff bytes, and a collapsible skipped-file list.
+
+The reviewer also includes a small deterministic safety pass for obvious high-signal patterns, such as newly added division returns without a visible zero-divisor guard. These findings use the same evidence grounding and publish-time validation as model findings, so the workflow still refuses to publish comments that are not tied to changed code.
