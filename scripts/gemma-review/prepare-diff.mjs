@@ -17,7 +17,7 @@ export async function prepareDiff(options = {}) {
   const pullRequest = extractPullRequest(event);
   const diffText = options.diffPath
     ? await readFile(options.diffPath, 'utf8')
-    : readDiffFromGit(pullRequest);
+    : readDiffFromGit(pullRequest, config);
 
   const parsed = parseUnifiedDiff(diffText, config);
   const chunks = createChunks(parsed.files, config.maxChunkBytes);
@@ -29,6 +29,7 @@ export async function prepareDiff(options = {}) {
       maxDiffBytes: config.maxDiffBytes,
       maxFileBytes: config.maxFileBytes,
       maxChunkBytes: config.maxChunkBytes,
+      diffContextLines: config.diffContextLines,
       maxInlineComments: config.maxInlineComments,
       failOnSeverity: config.failOnSeverity
     },
@@ -65,6 +66,8 @@ export function extractPullRequest(event) {
     owner,
     repo,
     number: pr.number,
+    title: clampText(pr.title, 300),
+    body: clampText(pr.body, 4000),
     baseSha: pr.base?.sha,
     headSha: pr.head?.sha,
     baseRef: pr.base?.ref,
@@ -74,7 +77,7 @@ export function extractPullRequest(event) {
   };
 }
 
-export function readDiffFromGit(pullRequest) {
+export function readDiffFromGit(pullRequest, config = loadConfig()) {
   if (!pullRequest.baseSha || !pullRequest.headSha || !pullRequest.number) {
     throw new Error('Pull request baseSha, headSha, and number are required to read git diff');
   }
@@ -97,10 +100,17 @@ export function readDiffFromGit(pullRequest) {
 
   return execFileSync('git', [
     'diff',
-    '--unified=0',
+    `--unified=${config.diffContextLines}`,
     '--no-ext-diff',
     buildDiffRange(mergeBase, prHeadRef)
   ], { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 });
+}
+
+function clampText(value, maxLength) {
+  if (typeof value !== 'string') {
+    return '';
+  }
+  return value.trim().slice(0, maxLength);
 }
 
 export function buildDiffRange(mergeBase, headRef) {

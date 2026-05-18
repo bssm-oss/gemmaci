@@ -37,6 +37,7 @@ export function loadConfig(env = process.env) {
     maxDiffBytes: readInteger(env, 'GEMMA_REVIEW_MAX_DIFF_BYTES', 200000),
     maxFileBytes: readInteger(env, 'GEMMA_REVIEW_MAX_FILE_BYTES', 60000),
     maxChunkBytes: readInteger(env, 'GEMMA_REVIEW_MAX_CHUNK_BYTES', 24000),
+    diffContextLines: readNonNegativeInteger(env, 'GEMMA_REVIEW_DIFF_CONTEXT_LINES', 3),
     maxInlineComments: readInteger(env, 'GEMMA_REVIEW_MAX_INLINE_COMMENTS', 20),
     minConfidence: readNumber(env, 'GEMMA_REVIEW_MIN_CONFIDENCE', 0.6),
     deterministicRules: readBoolean(env, 'GEMMA_REVIEW_DETERMINISTIC_RULES', true),
@@ -100,6 +101,19 @@ function readInteger(env, name, fallback) {
   const parsed = Number.parseInt(value, 10);
   if (!Number.isFinite(parsed) || parsed <= 0) {
     throw new Error(`${name} must be a positive integer`);
+  }
+  return parsed;
+}
+
+function readNonNegativeInteger(env, name, fallback) {
+  const value = env[name];
+  if (value === undefined || value === '') {
+    return fallback;
+  }
+
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    throw new Error(`${name} must be a non-negative integer`);
   }
   return parsed;
 }

@@ -22,8 +22,8 @@ export async function reviewPullRequest(options = {}) {
         ? await readMockPayload(options.mockModelPath, chunk.id)
         : await callOllama({ chunk, pullRequest: input.pullRequest, config });
       const validated = validateReviewPayload(payload, chunk, config);
-      if (validated.summary) {
-        summaries.push(validated.summary);
+      if (validated.summary.length > 0) {
+        summaries.push(...validated.summary);
       }
       allFindings.push(...validated.findings);
       if (config.deterministicRules) {
@@ -89,7 +89,7 @@ export function validateReviewPayload(payload, chunk, config) {
   }
 
   return {
-    summary: typeof payload.summary === 'string' ? payload.summary.slice(0, 6000) : '',
+    summary: normalizeSummaryParts(payload),
     findings: findings.slice(0, config.maxInlineComments)
   };
 }
@@ -249,17 +249,25 @@ function buildSummary({ summaries, findings, reviewedFileCount, skippedFiles, to
   if (degraded) {
     lines.push('', '> 일부 청크는 구조화된 리뷰를 완료하지 못했습니다.');
   }
-  if (summaries.length > 0) {
-    lines.push('', ...summaries.map((summary) => summary.trim()).filter(Boolean));
-  } else {
-    lines.push('', '리뷰할 변경사항에서 중요한 이슈를 찾지 못했습니다.');
-  }
-  lines.push('', `Inline findings: ${findings.length}`);
-  lines.push(`Highest severity: ${highestSeverity(findings)}`);
-  lines.push(`Minimum confidence: ${Math.round(minConfidence * 100)}%`);
+  lines.push('', '## Review status');
+  lines.push(`- Inline findings: ${findings.length}`);
+  lines.push(`- Highest severity: ${highestSeverity(findings)}`);
+  lines.push(`- Minimum confidence: ${Math.round(minConfidence * 100)}%`);
   const categoryCounts = countBy(findings, (finding) => finding.category);
   if (categoryCounts.size > 0) {
-    lines.push(`Categories: ${[...categoryCounts.entries()].map(([category, count]) => `${category}=${count}`).join(', ')}`);
+    lines.push(`- Categories: ${[...categoryCounts.entries()].map(([category, count]) => `${category}=${count}`).join(', ')}`);
+  }
+
+  if (summaries.length > 0) {
+    lines.push('', '## Change overview', ...summaries.map((summary) => summary.trim()).filter(Boolean));
+  } else {
+    lines.push('', '## Change overview', '리뷰할 변경사항에서 중요한 이슈를 찾지 못했습니다.');
+  }
+  if (findings.length > 0) {
+    lines.push('', '## Highest-risk findings');
+    for (const finding of findings.slice(0, 3)) {
+      lines.push(`- **${finding.severity.toUpperCase()}** ${finding.path}:${finding.line} - ${finding.title}: ${finding.recommendation}`);
+    }
   }
   lines.push('', '## Review scope');
   lines.push(`- Files reviewed: ${reviewedFileCount}`);
@@ -276,6 +284,16 @@ function buildSummary({ summaries, findings, reviewedFileCount, skippedFiles, to
     lines.push('</details>');
   }
   return lines.join('\n');
+}
+
+function normalizeSummaryParts(payload) {
+  const parts = [];
+  for (const key of ['summary', 'change_summary', 'risk_assessment', 'test_gaps', 'review_notes']) {
+    if (typeof payload[key] === 'string' && payload[key].trim()) {
+      parts.push(payload[key].trim().slice(0, 2000));
+    }
+  }
+  return parts;
 }
 
 function compareFindingPriority(left, right) {
