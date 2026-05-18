@@ -37,8 +37,8 @@
 
 이 저장소에서는 로컬 dry-run만 한 것이 아니라 GitHub Actions에서 실제 PR을 열어 검증했습니다.
 
-- 테스트 PR: `https://github.com/bssm-oss/gemmaci/pull/1`
-- 실제 workflow run: `https://github.com/bssm-oss/gemmaci/actions/runs/26008433761`
+- 테스트 PR: `https://github.com/bssm-oss/gemmaci/pull/2`
+- 실제 workflow run: `https://github.com/bssm-oss/gemmaci/actions/runs/26009211725`
 - `Prepare diff`: 성공
 - `Review with Gemma`: 성공
 - `Publish review`: 실패
@@ -48,7 +48,7 @@
 실제로 GitHub Actions bot이 PR에 다음을 게시한 것도 확인했습니다.
 
 - PR summary comment
-- `src/math.js:2` inline comment
+- `src/math.js:1` inline comment
 - finding 내용: `HIGH: 0 나눗셈 검증 누락`
 - evidence, confidence, recommendation 포함
 
@@ -206,7 +206,7 @@ PR summary comment에는 CodeRabbit 스타일의 review status 정보가 포함�
 4. PR summary와 inline comment가 게시되는지 확인합니다.
 5. high/critical finding에서 check가 실패하는지 확인합니다.
 
-이 저장소에서는 위 절차를 `#1` smoke PR로 검증했습니다.
+이 저장소에서는 위 절차를 `#2` smoke PR로 검증했습니다.
 
 ## 알려진 한계
 

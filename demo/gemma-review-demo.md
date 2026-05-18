@@ -4,10 +4,10 @@
 
 ## Live targets
 
-- PR: https://github.com/bssm-oss/gemmaci/pull/1
-- Actions run: https://github.com/bssm-oss/gemmaci/actions/runs/26008433761
-- Summary comment: https://github.com/bssm-oss/gemmaci/pull/1#issuecomment-4473316875
-- Inline finding: https://github.com/bssm-oss/gemmaci/pull/1#discussion_r3255873674
+- PR: https://github.com/bssm-oss/gemmaci/pull/2
+- Actions run: https://github.com/bssm-oss/gemmaci/actions/runs/26009211725
+- Summary comment: https://github.com/bssm-oss/gemmaci/pull/2#issuecomment-4473499320
+- Inline finding: https://github.com/bssm-oss/gemmaci/pull/2#discussion_r3255933478
 
 ## What happened
 
@@ -26,10 +26,10 @@
 
 ## Included data files
 
-- `pr-1-demo-data.json`: PR status, comments, checks, files.
-- `run-26008433761-demo-data.json`: Actions run and job details.
-- `pr-1-inline-comments.json`: inline PR comments, including the Gemma reviewer comment.
-- `run-26008433761-artifacts.json`: Actions artifacts from the run.
+- `pr-2-demo-data.json`: PR status, comments, checks, files.
+- `run-26009211725-demo-data.json`: Actions run and job details.
+- `pr-2-inline-comments.json`: inline PR comments, including the Gemma reviewer comment.
+- `run-26009211725-artifacts.json`: Actions artifacts from the run.
 
 ## Optional video capture
 
@@ -37,7 +37,7 @@ On macOS, record the PR and Actions run with:
 
 ```bash
 mkdir -p demo
-open -a "Google Chrome" "https://github.com/bssm-oss/gemmaci/pull/1"
+open -a "Google Chrome" "https://github.com/bssm-oss/gemmaci/pull/2"
 sleep 3
 screencapture -v -V 45 -k -D 1 "demo/gemma-review-demo.mov"
 ffmpeg -y -i "demo/gemma-review-demo.mov" \
